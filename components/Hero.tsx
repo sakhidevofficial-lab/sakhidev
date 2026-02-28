@@ -30,7 +30,7 @@ export default function Hero() {
         {/* Sub */}
         <p className="hero-anim-4 text-gray-500 font-light leading-relaxed mb-10 mx-auto max-w-md"
           style={{ fontSize: 'clamp(14px, 2vw, 17px)' }}>
-          sakhidev is a freelance dev studio crafting fast, elegant web products — from pixel-perfect UIs to robust backends.
+          sakhidev is a modern web development agency crafting fast, elegant digital products — from pixel-perfect UI to powerful, scalable backend systems.
         </p>
 
         {/* Buttons */}
