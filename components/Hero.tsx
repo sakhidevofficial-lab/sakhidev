@@ -1,17 +1,18 @@
 'use client'
+import Link from 'next/link'
 
 export default function Hero() {
   return (
     <section className="hero-gradient relative min-h-screen flex items-center justify-center text-center px-6 md:px-10 pt-24 pb-32 overflow-hidden">
 
-      {/* Available badge */}
+      {/* Background glow */}
       <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none" aria-hidden>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #3B5BDB 0%, transparent 70%)' }} />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
 
-        {/* Pill */}
+        {/* Availability pill */}
         <div className="hero-anim-1 inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 text-xs font-medium text-green-700 border border-green-200" style={{ background: '#F0FDF4' }}>
           <span className="pulse-dot w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
           Available for new projects
@@ -27,15 +28,16 @@ export default function Hero() {
           <em className="not-italic font-light" style={{ color: '#3B5BDB' }}>Experiences</em> That Scale
         </h1>
 
-        {/* Sub */}
+        {/* Subtitle */}
         <p className="hero-anim-4 text-gray-500 font-light leading-relaxed mb-10 mx-auto max-w-md"
           style={{ fontSize: 'clamp(14px, 2vw, 17px)' }}>
           sakhidev is a modern web development agency crafting fast, elegant digital products — from pixel-perfect UI to powerful, scalable backend systems.
         </p>
 
-        {/* Buttons */}
+        {/* ✅ Buttons now use Link — properly navigate */}
         <div className="hero-anim-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <button
+          <Link
+            href="/contact"
             className="w-full sm:w-auto flex items-center justify-center gap-2 text-sm font-medium text-white rounded-full px-7 py-3.5 transition-all duration-250 hover:scale-105 active:scale-95"
             style={{ background: '#0D1B3E', boxShadow: '0 4px 20px rgba(13,27,62,0.25)' }}
             onMouseEnter={e => { e.currentTarget.style.background = '#3B5BDB'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(59,91,219,0.35)'; }}
@@ -43,18 +45,19 @@ export default function Hero() {
           >
             Start a Project
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <button
+          </Link>
+          <Link
+            href="/work"
             className="w-full sm:w-auto flex items-center justify-center gap-2 text-sm font-medium rounded-full px-7 py-3.5 border border-gray-200 text-gray-700 transition-all duration-200 hover:border-blue-400 hover:text-blue-600 active:scale-95"
             style={{ background: 'transparent' }}
             onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
           >
             View Work
-          </button>
+          </Link>
         </div>
 
-        {/* Bottom image strip */}
+        {/* Bottom bar strip */}
         <div className="hero-anim-6 flex items-end justify-center gap-2 sm:gap-3 mt-16 sm:mt-20">
           {[
             { label: 'UI', h: 'h-14 sm:h-16', grad: 'from-blue-200 to-indigo-300' },
@@ -73,14 +76,13 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Social links - hidden on small screens */}
+      {/* Social links */}
       <div className="hidden lg:flex absolute bottom-10 left-10 flex-col gap-2">
         {['GITHUB ↗', 'LINKEDIN ↗'].map(s => (
           <a key={s} href="#" className="text-xs font-medium text-gray-400 hover:text-blue-600 transition-colors tracking-widest">{s}</a>
         ))}
       </div>
 
-      {/* Desc - hidden on small screens */}
       <p className="hidden lg:block absolute bottom-10 right-10 text-xs text-gray-400 max-w-[180px] text-right leading-relaxed font-light">
         Building elegant solutions through thoughtful code and meticulous design.
       </p>

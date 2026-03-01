@@ -1,36 +1,55 @@
 'use client'
-import { useReveal } from './useReveal'
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
-const steps = [
+const DEFAULT_STEPS = [
   { num: '01', title: 'Listen & Learn', desc: 'We begin by listening to you — your goals, users, constraints, local partners, and community.' },
-  { num: '02', title: 'Co-Create with Conviction', desc: 'Design and development happen in tight loops. You\'re involved every step of the way.' },
-  { num: '03', title: 'Support Long-Term Growth', desc: 'Post-launch support, iteration, and scaling — we\'re committed for the long run.' },
+  { num: '02', title: 'Co-Create with Conviction', desc: "Design and development happen in tight loops. You're involved every step of the way." },
+  { num: '03', title: 'Support Long-Term Growth', desc: "Post-launch support, iteration, and scaling — we're committed for the long run." },
 ]
 
 export default function HowWeWork() {
-  const ref = useReveal()
+  const ref = useRef<HTMLElement>(null)
+  const [steps, setSteps] = useState(DEFAULT_STEPS)
+
+  useEffect(() => {
+    const section = ref.current; if (!section) return
+    const els = section.querySelectorAll('.reveal')
+    const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }), { threshold: 0.1 })
+    els.forEach(el => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    supabase.from('settings').select('*').then(({ data }) => {
+      if (!data) return
+      const s: Record<string, string> = {}
+      data.forEach((row: { key: string; value: string }) => { s[row.key] = row.value })
+      const loaded = [1, 2, 3].map((n, i) => ({
+        num: `0${n}`,
+        title: s[`how_step_${n}_title`] || DEFAULT_STEPS[i].title,
+        desc: s[`how_step_${n}_desc`] || DEFAULT_STEPS[i].desc,
+      }))
+      setSteps(loaded)
+    })
+  }, [])
 
   return (
-    <section ref={ref} className="py-20 sm:py-28 px-6 md:px-10 lg:px-14" style={{background:'#FAFAFA'}}>
+    <section ref={ref} className="pt-10 sm:pt-14 pb-16 sm:pb-20 px-6 md:px-10 lg:px-14" style={{ background: '#FAFAFA' }}>
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-        {/* Text side */}
         <div className="reveal order-2 lg:order-1">
           <p className="text-xs tracking-widest uppercase text-gray-400 mb-4">Our Approach</p>
-          <h2 className="font-serif font-light leading-tight mb-8" style={{fontSize:'clamp(28px,3vw,42px)',letterSpacing:'-1px',color:'#111827'}}>
+          <h2 className="font-serif font-light leading-tight mb-8" style={{ fontSize: 'clamp(28px,3vw,42px)', letterSpacing: '-1px', color: '#111827' }}>
             How We Create<br />Changes Together
           </h2>
-
           <button
             className="flex items-center gap-2 text-sm font-medium text-white rounded-full px-6 py-3 mb-10 transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{background:'#0D1B3E'}}
-            onMouseEnter={e => e.currentTarget.style.background='#3B5BDB'}
-            onMouseLeave={e => e.currentTarget.style.background='#0D1B3E'}
+            style={{ background: '#0D1B3E' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#3B5BDB'}
+            onMouseLeave={e => e.currentTarget.style.background = '#0D1B3E'}
           >
             Join With Us
           </button>
-
-          {/* Steps */}
           <div className="flex flex-col">
             {steps.map((s, i) => (
               <div key={i} className={`split-step flex gap-5 py-5 cursor-default ${i < steps.length - 1 ? 'border-b border-gray-100' : ''}`}>
@@ -43,15 +62,12 @@ export default function HowWeWork() {
             ))}
           </div>
         </div>
-
-        {/* Image side */}
         <div
           className="reveal reveal-delay-2 order-1 lg:order-2 rounded-2xl sm:rounded-3xl overflow-hidden flex items-center justify-center font-serif text-indigo-400 font-light"
-          style={{height:'clamp(280px, 45vw, 500px)', background:'linear-gradient(135deg, #C7D2FE 0%, #A5B4FC 50%, #818CF8 100%)', fontSize:'clamp(14px,2vw,17px)'}}
+          style={{ height: 'clamp(280px,45vw,500px)', background: 'linear-gradient(135deg,#C7D2FE 0%,#A5B4FC 50%,#818CF8 100%)', fontSize: 'clamp(14px,2vw,17px)' }}
         >
           Crafting with purpose
         </div>
-
       </div>
     </section>
   )

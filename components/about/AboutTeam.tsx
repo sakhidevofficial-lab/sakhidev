@@ -1,32 +1,7 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { useReveal } from '@/components/useReveal'
-
-const team = [
-  {
-    name: 'Sekh Dev',
-    role: 'Founder & Lead Engineer',
-    bio: 'Full-stack engineer with 5+ years building products. Obsessed with performance, clean architecture, and interfaces that feel inevitable.',
-    initials: 'SD',
-    gradient: 'linear-gradient(135deg, #3B5BDB, #6366F1)',
-    links: { github: '#', linkedin: '#', twitter: '#' },
-  },
-  {
-    name: 'Alex Rivera',
-    role: 'UI/UX Designer',
-    bio: 'Designs with a systems-first mindset. Bridges the gap between beautiful and functional with a bias for simplicity.',
-    initials: 'AR',
-    gradient: 'linear-gradient(135deg, #6366F1, #818CF8)',
-    links: { github: '#', linkedin: '#', twitter: '#' },
-  },
-  {
-    name: 'Jordan Kim',
-    role: 'Backend Engineer',
-    bio: 'Infrastructure and API specialist. If it scales, Jordan probably had a hand in it.',
-    initials: 'JK',
-    gradient: 'linear-gradient(135deg, #0891B2, #06B6D4)',
-    links: { github: '#', linkedin: '#', twitter: '#' },
-  },
-]
+import { supabase, type TeamMember } from '@/lib/supabase'
 
 const SocialIcon = ({ type }: { type: string }) => {
   if (type === 'github') return (
@@ -48,19 +23,25 @@ const SocialIcon = ({ type }: { type: string }) => {
 
 export default function AboutTeam() {
   const ref = useReveal()
+  const [members, setMembers] = useState<TeamMember[]>([])
+
+  useEffect(() => {
+    supabase
+      .from('team')
+      .select('*')
+      .eq('visible', true)
+      .order('sort_order', { ascending: true })
+      .then(({ data }) => { if (data) setMembers(data) })
+  }, [])
 
   return (
     <section ref={ref} className="py-24 sm:py-32 px-6 md:px-10 lg:px-14" style={{ background: '#FAFAFA' }}>
       <div className="max-w-6xl mx-auto">
 
-        {/* Header */}
         <div className="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16">
           <div>
             <p className="text-xs tracking-widest uppercase text-gray-400 mb-4">The People</p>
-            <h2
-              className="font-serif font-light leading-tight"
-              style={{ fontSize: 'clamp(28px, 3.5vw, 52px)', letterSpacing: '-1px', color: '#111827' }}
-            >
+            <h2 className="font-serif font-light leading-tight" style={{ fontSize: 'clamp(28px, 3.5vw, 52px)', letterSpacing: '-1px', color: '#111827' }}>
               Small team.<br />
               <em className="not-italic" style={{ color: '#3B5BDB' }}>Outsized</em> impact.
             </h2>
@@ -70,85 +51,62 @@ export default function AboutTeam() {
           </p>
         </div>
 
-        {/* Team cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 reveal reveal-delay-1">
-          {team.map((member, i) => (
-            <div
-              key={i}
-              className="group rounded-2xl border border-gray-200 bg-white overflow-hidden cursor-default transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
-            >
-              {/* Avatar block */}
-              <div
-                className="h-48 sm:h-52 flex items-center justify-center font-serif text-4xl font-light text-white relative overflow-hidden"
-                style={{ background: member.gradient }}
-              >
-                {member.initials}
-                {/* Shine effect */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%)' }}
-                />
-              </div>
-
-              {/* Info */}
-              <div className="p-6 sm:p-7">
-                <h3 className="font-serif text-lg font-light text-gray-900 mb-0.5" style={{ letterSpacing: '-0.3px' }}>
-                  {member.name}
-                </h3>
-                <p className="text-xs font-medium mb-4" style={{ color: '#3B5BDB' }}>{member.role}</p>
-                <p className="text-sm font-light leading-relaxed text-gray-500 mb-5">{member.bio}</p>
-
-                {/* Social links */}
-                <div className="flex items-center gap-3">
-                  {Object.entries(member.links).map(([type, href]) => (
-                    <a
-                      key={type}
-                      href={href}
-                      className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-                      style={{
-                        background: '#F3F4F6',
-                        color: '#6B7280',
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.background = '#EEF2FF'
-                        e.currentTarget.style.color = '#3B5BDB'
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.background = '#F3F4F6'
-                        e.currentTarget.style.color = '#6B7280'
-                      }}
-                    >
-                      <SocialIcon type={type} />
-                    </a>
-                  ))}
+          {members.length === 0 ? (
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+                <div className="h-48 sm:h-52 animate-pulse bg-gray-100" />
+                <div className="p-6 space-y-3">
+                  <div className="h-5 bg-gray-100 rounded animate-pulse w-1/2" />
+                  <div className="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+                  <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            members.map((member) => (
+              <div key={member.id} className="group rounded-2xl border border-gray-200 bg-white overflow-hidden cursor-default transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+                <div className="h-48 sm:h-52 flex items-center justify-center font-serif text-4xl font-light text-white relative overflow-hidden"
+                  style={{ background: member.gradient }}>
+                  {member.initials}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%)' }} />
+                </div>
+                <div className="p-6 sm:p-7">
+                  <h3 className="font-serif text-lg font-light text-gray-900 mb-0.5" style={{ letterSpacing: '-0.3px' }}>{member.name}</h3>
+                  <p className="text-xs font-medium mb-4" style={{ color: '#3B5BDB' }}>{member.role}</p>
+                  <p className="text-sm font-light leading-relaxed text-gray-500 mb-5">{member.bio}</p>
+                  <div className="flex items-center gap-3">
+                    {[['github', member.github], ['linkedin', member.linkedin], ['twitter', member.twitter]].filter(([, href]) => href).map(([type, href]) => (
+                      <a key={type} href={href} target="_blank" rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+                        style={{ background: '#F3F4F6', color: '#6B7280' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.color = '#3B5BDB' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#6B7280' }}>
+                        <SocialIcon type={type} />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
-        {/* Hiring banner */}
-        <div
-          className="reveal reveal-delay-2 mt-8 rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6"
-          style={{ background: '#EEF2FF', border: '1px solid #C7D2FE' }}
-        >
+        <div className="reveal reveal-delay-2 mt-8 rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6"
+          style={{ background: '#EEF2FF', border: '1px solid #C7D2FE' }}>
           <div>
-            <h4 className="font-serif text-xl font-light mb-1" style={{ color: '#0D1B3E', letterSpacing: '-0.5px' }}>
-              Want to join the team?
-            </h4>
+            <h4 className="font-serif text-xl font-light mb-1" style={{ color: '#0D1B3E', letterSpacing: '-0.5px' }}>Want to join the team?</h4>
             <p className="text-sm font-light text-gray-500">We occasionally collaborate with talented designers and engineers.</p>
           </div>
-          <button
-            className="flex-shrink-0 flex items-center gap-2 text-sm font-medium text-white rounded-full px-6 py-3 transition-all duration-200 hover:scale-105 active:scale-95"
+          <button className="flex-shrink-0 flex items-center gap-2 text-sm font-medium text-white rounded-full px-6 py-3 transition-all duration-200 hover:scale-105 active:scale-95"
             style={{ background: '#0D1B3E' }}
             onMouseEnter={e => e.currentTarget.style.background = '#3B5BDB'}
-            onMouseLeave={e => e.currentTarget.style.background = '#0D1B3E'}
-          >
+            onMouseLeave={e => e.currentTarget.style.background = '#0D1B3E'}>
             Say Hello →
           </button>
         </div>
-
       </div>
     </section>
   )
